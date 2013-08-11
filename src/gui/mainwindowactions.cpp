@@ -36,6 +36,8 @@
 #include "tableview.h"
 #include "version.h"
 
+#include "popheronextorplay.h"
+
 #include <time.h>
 
 #include <QtGui>
@@ -1181,18 +1183,20 @@ bool MainWindow::heroNextGame()
 
 void MainWindow::slotToggleHero()
 {
-    slotGameChanged();
     if (m_hero->isChecked()){
         if (m_currentDatabase == -1 || m_databases[m_currentDatabase]->database()->count() == 0){
-           QMessageBox::information(QApplication::activeWindow(), tr("No Games"), tr("First load a database of games before entering Hero mode."));
-           m_hero->setChecked(false);
+           slotFileOpen();
+
+           //call this again since opening a file takes some time
+           QTimer::singleShot(400, this, SLOT(slotToggleHero()));
            return;
-        }else{
-            m_boardView->setDbIndex(m_currentDatabase);
-            UpdateBoardInformation();
         }
+        m_boardView->setDbIndex(m_currentDatabase);
+        UpdateBoardInformation();
+        //turn off the stupid square box guess move click thing
         m_boardView->setFlags(BoardView::SuppressGuessMove);
         heroNextGame();
+        slotGameChanged();
     }else{ //turning off hero mode
        m_mainAnalysis->show();
        m_mainAnalysis->stopEngine();
@@ -1220,10 +1224,15 @@ int MainWindow::HeroPositionAnalysis()
         if (score > m_lastBestMoveScore){
             finishOperation(QString(" Better than the best!"));
 
+
+            popHeroNextOrPlay* popNextOrPlay = new popHeroNextOrPlay();
+            popNextOrPlay->ui->lblHeader->setText("Better than engine picked!");
+            //connect(popNextOrPlay->ui->btnNextPosition,
+            popNextOrPlay->show();
             heroNextGame();
 
             //let the computer respond now
-            //computerPlayBestMove();
+            computerPlayBestMove();
         }else if (score > m_lastBestMoveScore - handicap){
             finishOperation(QString(" Good Move!"));
             heroNextGame();

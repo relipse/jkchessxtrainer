@@ -33,8 +33,6 @@
 #include "pgndatabase.h"
 #include "playerlistwidget.h"
 #include "preferences.h"
-//#include "quazip.h"
-//#include "quazipfile.h"
 #include "savedialog.h"
 #include "settings.h"
 #include "tablebase.h"
