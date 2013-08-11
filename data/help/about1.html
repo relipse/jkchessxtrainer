@@ -1,0 +1,145 @@
+<html>
+
+<head>
+<link rel="stylesheet" type="text/css" href=":/help/about.css" />
+<link rel="stylesheet" type="text/css" href="about.css" />
+<meta content="en" name="language" />
+<meta content="en" http-equiv="Content-Language" />
+<meta name="viewport" content="user-scalable=no, width=device-width" />
+
+<title>ChessX Manual</title>
+
+<body>
+
+<div id="container">
+<div id="header">
+
+<h1>ChessX Help</h1>
+
+<div id="nav">
+<ul>
+
+<li><a href="about0.html">Basics</a></li>
+<li><b>Manual</b></li>
+ <li><a href="about2.html">Reference</a></li>
+ <li><a href="about3.html">Copyrights</a></li>
+
+</ul>
+</div>
+</div>
+
+<div id="content">
+<h2><a name="Handbuch">ChessX Manual</a></h2>
+
+ <h3>Opening a database</h3>
+ <p>You can open a database either from the File menu or drag a file from Explorer / Finder into the Databases view.</p>
+ <p>You can make a database stay permanently in the database list by turning it into a "Favorite" (right-click the file).
+ A database is reopened from there by clicking the asterisk or again by the context menu.</p>
+ <p>You can also drag files from yor Internet Browser into the ChessX Database List, they are downloaded into
+ the configured default path (see the Preferences-Advanced-Default Data Path entry). If they are compressed (zip),
+ the archive is stored at the Default Data Path and its content is extracted. Again, if there is something like PGN inside,
+ the files are opened afterwards.</p>
+
+ <h3>Making moves</h3>
+ <p>A move is done by gabbing a piece and dragging it
+ to another square.</p>
+ <p>Depending on your settings in the board preferences,
+ you can either
+ <ul>
+  <li>Click on a piece and a target square (if move guesses are deactivated)
+  <li>Click on a piece and accepting the move quess (in case of deactivated next guess on right click)
+  <li>Right Click on a piece and then again until the correct target square is high-lighted, then press the
+  left mouse button to make the move (in case right click is used for next guess).
+ </ul>
+ </p>
+ <p>Going back a move can be done by a right-click (in case the right click is not configured for backtracking a move)
+ or by pressing CTRL-right click if backtracking is assigned to the right mouse key.</p>
+
+ <p>Usually, making a move will insert a new variation unless you are at the end of the game or a variation. If you do not
+want to create a new variation, press CTR while moving, which replaces the current move and all following moves by the new move.</p>
+<p>If you want to exchange a move without deleting subsequent moves, you can press CTRL+ALT while moving, this will exchange
+the move played with the new move and check the remaining game for illegal positions. The game is then truncated at these illegal positions.</p>
+
+<p>If you want ChessX to replay the game, select "Game->Auto Player". You can change the move rate in the Game Preferences.</p>
+
+<h3>Annotating moves</h3>
+<p>Move annotations can be done by activating the context menu in the games text browser or by simply pressing the corresponding key sequence,
+e.g. '!?','!!','??','!x','?x','=','+-','-+' and so on, where 'x' is used in case the first character is ambiguous, 'x' can be the
+Return/Enter-Key or literally the small letter 'x'.</p>
+<p>You can make special annotations like drawing an arrow or coloring squares by pressing Shift+Right-Mouse-Clicking (either select a single square
+or make a drawing gesture for drawing an arrow).</p>
+
+<h3>Saving games</h3>
+<p>Saving games is slightly confusing! A game needs to be saved into the database (Press CTRL+S, Menu Game/Save). From there,
+the whole database needs to be saved to disk by pressing CTRL+Shift+S / Menu File/Save. This is somewhat inconvenient but on the other hand prevents
+you from mistakenly overwriting games or files.</p>
+<p>If you want to commit a database to harddisk immediatelly and automatically when saving a game, you can select Option "Commit Database
+after Saving Game" from the Database Pane in the Preferences Dialog.</p>
+<p>By default, a clipboard database is open, which does not have a backing file on disk. Anything that remains in the Clipboard is
+lost upon closing ChessX! So you need to open at least one other database for writing and transfer anything from the Clipboard
+into this database by either dragging the games to that database or using "Copy Games" from the Database menu.</p>
+
+<h3>Switching databases</h3>
+<p>Switching between open databases can be achieved by either the Database menu, pressing CTRL+Number 0 .. 9 or right-clicking
+into the database list. The currently selected database is highlighted there!</p>
+
+<h3>Analysing games</h3>
+<p>There are two analysis windows where two different engines can be configured to analyse the current board position.</p>
+<p>Engines must be configured before in the Preferences Dialog. A default engine (Stockfish) comes with this installation
+and will be configured as first engine, if no other entries exist.
+Stockfish is an open source engine (see <a href="http://stockfishchess.org">Homepage of Stockfish</a>. The Mac OS
+version has been compiled less agressively than the original one so that users of pre-I5 Intel computers will have their fun, too.
+The source code for the Stockfish engine is completely unmodified so you can replace the pre-installed versions by the original
+or any other version. The source code for stockfish is also located on the homepage. Note that Sotckfish is licensed under GPLv3,
+see the license text on the Stockfish home.</p>
+<p>You can fine-tune engines with the protocol options dialog (works for UCI only, Winboard is seldom used and due to the clumsy specification
+hard to implement for GUI developers.</p>
+
+<h3>Automatically annotating games</h3>
+<p>Start an engine in the Analysis 1 window and select menu "Game->Auto Analysis". ChessX will start to move through the
+current game, analysing each position for some time. After the alotted time is over, the best move will be inserted as variation into the game
+text. Then ChessX will continue with the next move.</p>
+<p>There are a couple of options which have an influence on the behaviuor:</p>
+<ul>
+<li>Preferences->Game->Auto-Play-Interval determines the time, ChessX will us for each position
+<li>Preferences->Game->Automatically save and continue with next game: This allows analysing a complete database, select this option, start Engine 1,
+open the first game from the database and select move 1.
+<li>Preferences->Database->Commit Database after saving Game: Recommended, commits your results to the harddisk after each game, especially if you
+analyse a complete database, a loss of power will otherwise lose all results so far.
+</ul>
+
+<h3>Generating content</h3>
+<p>You can copy/paste positions(FEN and images) and complete games(PGN) from/into the clipboard, export games in LATEX, HTML or PGN again.
+See the Edit menu and the File/Export Dialog.</p>
+
+<h3>Merging games</h3>
+<p>By dragging a game from the game list into the current notation, the dragged game will be merged into the current game at the
+first position after the current position, where both games deviate. The game will be merged with all annotations and variations.
+If nothing is merged, no suitable point for merging was found. This can happen, if</p>
+<ul>
+<li>no position could be found where both games where equal (after the current position!)
+<li>the remainder of the game to be merged in was already contained in the current game
+</ul>
+
+<h3>Customizing Listviews</h3>
+<p>All views can have their font-size set in the Preferences Dialog. In addtion, all list header support resizing,
+moving and hiding of columns. Columns are hidden / shown by right-clicking the list header element. All changes are persistent.</p>
+
+<h3>Filtering Games</h3>
+<p>The list of games can be filtered either by the opening tree or by clicking the list header. Several searches can be combined or inverted.
+Further occurrences of the current board position in the current database can be found via the Find / Find Position menu.</p>
+
+<h3>Training Mode</h3>
+<p>Selecting Game/Training starts the training mode. Moves starting from the current move are hidden on the game sheet. You can't modify a game
+so you can make any move in a position. If the move is the right one (the one that was played or a existing variation) then the move is executed
+and the game is moved one step forward.
+The game notation is updated and variations on that move become visible. Ideal for use with a tactics database.</p>
+<p>If you have no idea what to move, you can get hints by hovering with the mouse over your pieces. Perhaps, the right move pops up!
+See the chapter on Making Moves and the associated preferences to enable move guesses.</p>
+
+</div>
+</div>
+
+</body>
+
+</html>

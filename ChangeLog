@@ -1,0 +1,304 @@
+March 2013 Version 0.9.6
+
+        - Bugfix / Feature removal: Filtering opening tree was somewhat active
+
+        - Bugfix: (thx to James!) Promoting into different pieces cannot start
+        - Bugfix: Before closing a database ask to save a new or modified game
+        - Bugfix: CR#3596577 - Game modifications lost when changing a game
+        - Bugfix: Ctrl+Drag in BoardSetup-Dialog loses a button
+        - Bugfix: DatabaseList view shows Linked local files with annoying scheme
+        - Bugfix: Drawing board when resizing off by 1
+        - Bugfix: Enable Escape-Key for Dialogs
+        - Bugfix: Flickering with OpeningTree open
+        - Bugfix: New Game did not clear the tags from the last game
+        - Bugfix: Openening ECO files missed some checks
+        - Bugfix: Opening ZIP or URL from Commandline or event loop was missing
+        - Bugfix: Parsing half move count in FEN (Francis Monkman)
+        - Bugfix: Removing a variation removed the wrong variation
+        - Bugfix: Saving a database did not reset the modified flag resulting in
+        - Bugfix: Selected wrong game when deleting games from Database 
+        
+        - New Feature: Accept FENs which do not have a valid EnPassant Encoding
+        - New Feature: AutoPlayer
+        - New Feature: Continuous Blunder Checking
+        - New Feature: Drag Drop complete db onto other db
+        - New Feature: Player List with linked ECO filtering
+        - New Feature: PlayerList gives hints on openings played
+        - New Feature: Sorting the list of databases with header click
+        - New Feature: Support Team Tags when saving games
+        - New feature: Accept FEN with invalid movenumber (James Coons suggestion)
+        - New feature: Reload last game at open of database
+        - New feature: Mass changing tags in database (Events, Player Names)
+        - New feature: Shift+Rightclick on Boardview allows editing of colored
+        - New feature: Training mode
+        - New feature: Numbering variations
+        - New feature: Refactor complete game (uncomment / remove all variations)
+        - New feature: Saving a game can now be either cancelled (the new option)
+        - New feature: Edit square colors like in chessbase with Shift+Right-
+        - New feature: Delete games from a database
+        - New feature: Auto Analysis with Engine 1 of one or more games
+        - New feature: Clear cache between database changes
+        - New feature: Reorder variations - CR#3558001
+        - New feature: Force adding a move as variation by pressing ALT while
+        - New feature: Copy Fen in human readable form - CR#3580030
+        - New feature: DatabaseList double click opens file
+	- New feature: Highlight last move done when scrolling through a game
+
+December 2012 Version 0.9.4
+
+        - Bugfix: Writing of files automatically made use of UTF8 instead of ANSI
+        - Bugfix: Crash at loading PolyGlot 1.4
+        - Bugfix: Comment at start of empty game
+        - Bugfix: Databases larger than 4G
+        - Bugfix: Databases with UNIX-LF
+        - Bugfix: Some nags were not properly accessible from keyboard
+        - Bugfix: No keyboard nags for first white move
+
+        - New Feature: Time Editor for elapsed game time
+        - New Feature: CR#3580029 Add only first move from engine analysis
+        - New feature: Close database from the database list with context menu
+        - New feature: Toggle UTF8 flag in database list
+        - New feature: Open compressed archives (from HTTP or local file)
+        - New feature: Open a database from a URL (HTTP)
+        - New Feature: Clear Nags from keyboard with <Del>
+        - New Feature: Create Index File thus accelerating re-loading of large PGN enormously
+        - New Feature: Searching of ranges, e.g. ELO "2000-2300"
+        - New Feature: Automatic classification with ECO of unclassified / new games
+
+November 2012 Version 0.9.2
+	- Bugfix: Support engines which send multiple spaces
+	- Bugfix: Close Database while updateing opening tree
+	- Bugfix: Filtering for number of moves fails if an empty game is in the database
+	- Bugfix: Not well behaving Xboard engines crash ChessX 
+	- Bugfix: Search of Board crashes when started together with OpeninTree Update
+	- Bugfix: Press CTRL+drag to irritate the guessMove implementation
+
+	- New Feature: Move Indicator adjusts itself in size (James Coons)
+	- New Feature: Common Font Size for all widgets except game view
+	- New Feature: Separate handling of UTF8 files
+	- New feature: List views can be customized (right click title line)
+	- New feature: UCI Option Parser
+	- New Feature: CTRL+drag, CTRL-Shift-Drag replaces or inserts a move
+	- New Feature: F1 starts Help View and some help contents are already there
+	- New Feature: Games with errors insided are marked red in game list
+	- New feature: Added Stockfish as internal Engine in case no engine is configured
+
+	- New board themes Brazilwood and Maple
+	- New Icons
+
+	- Usability: Filterflag only influences gamelist
+
+September 2012 Version 0.9
+
+	* New Features
+	- Player List as Dock Window
+	- New Database List
+	- Drag and Drop of games
+	- Drag and Drop of Databases
+	- Second analysis window
+	- Locate Databases on harddisk in Explorer/Finder
+	- Multi-Threading Support for opening DB and updating Opening Tree
+	- Copy / Paste of PGN
+	- Create Images of Boards
+	- New Board Styles
+	- All Resources internal
+	- Parsing PGN to draw arrows on board (cf. chessbase)
+	- Parsing PGN to color Squares (cf. chessbase)
+	- Parse / Insert Zero Moves to document / analyze threats
+	- Drag'n'Drop Support setting up a board
+	- Relaxed FEN handling for easier pasting of FENs
+	- Version Resource in Windows
+	- Icon Resource in Windows
+	- UTF8 Support
+
+
+	* bugfixes in Parser
+	- Fixed some strange PGN parsing issues - especially issues like the one described in #3396532
+	* bugfixes in GUI
+	- It is not possible to add a variation from Analysis to a game text if standing at end of a variation
+	- Bugfixes starting up engines
+	- Disabled MultiPV on XBoard engines
+	- Added elapsed time for analysis lines
+
+	* issues closed:
+
+	- CR#2984375	Saving Clipboard fails silently
+	- CR#3043278	Problem with LaTeX output
+	- CR#3135871	No control performed on input date
+	- CR#3135871	No control performed on input date
+	- CR#2872974	Remove->Previous moves should be smarter
+	- CR#3542101	Changing and saving a file does not update the game list view
+	- CR#2881228 Crash on File->Close (or Quit) with OpeningTree updating
+	- CR#3297478 Crash on move gxh2+
+	- CR#2823746 Crash when trying to analyze with non-existing New Engine
+	- CR#2881228 Crash on File->Close (or Quit) with OpeningTree updating
+	- CR#3170534 Crash if start of engine fails (0.8)
+	- CR#3179203 Do not crash trying to show a special NAG; this should solve bug .
+	- CR#2824024 Confusion between slash and backslash in file paths
+	- CR#1773747 "Change guessed move on right click". The feature can be configured, as currently we have "take back a move" om mouse right click (if configured, CTRL+right-mouse will move back instead)
+	- CR#1651405 "Comments in UTF-8 are broken"
+	- CR#1715720
+	- CR#1984912 Names in GameList vs QuickTagSearch
+	- CR#3043278 Problem with LaTeX output
+	- CR#3396532 errors reading multi line pgn formats
+	- CR#2955889.
+
+	* Building 
+	- Separate Debug/Release/Static folders
+
+November 20120 Version 0.8
+
+	* bug fixes: engine stuff
+	* feature:Add engine variation to the game
+	* feature:Implement MultiPV analysis for UCI engines (based on patch by Juan Carlos Girardi)
+	* feature:Add basic NAG editing
+	* feature:Simplify adding moves: always add variation if move exists.
+	* feature:Add menu command to remove/promote variation.
+	* feature:Show TableBase result in Analysis window.
+
+Wed 10 Feb 2010, 01:40:00 CET Version 0.7
+
+	* bugfix: do not crash when removing engines
+	* bugfix: no problems with more than 10 engines
+	* bugfix: do not stop running engine on minimize/hide
+	* usability: browse for executable when adding new engines
+	* bugfix: correctly display NAGs below the board
+	* bugfix: correctly truncate previous moves
+	* feature: global shortcut F2 to start/stop engine
+	* change: speedup by canceling previous OpeningTree search before the next
+	* bugfix: ignore clicks on illegal OpeningTree moves like [end]
+	* feature: make editable PGN size limit configurable
+	* feature: show progress bar when opening/saving files
+	* feature: show progress bar for OpeningTree
+	* feature: promote variation
+
+Wed 1 Jul 2009, 00:50:22 CET Version 0.6
+
+	* feature: warn when quitting with unsaved databases
+	* feature: improve Engine tab of Preferences dialog, add reordering
+	* feature: remember current engine
+	* bugfix: show correct score for Crafty
+	* bugfix: correctly display variations leading to mate in UCI engines
+	* bugfix: update ECO database for opening detection and move guesser
+	* bugfix: improve focus handling in game list and game text
+	* feature: timer-delayed game loading when pressing Ctrl+Down/Up
+	* bugfix: remove bold column names in TableView
+	* bugfix: support NAGs not preceeded with space in PGN parser
+	* bugfix: make PGN parser more robust
+	* bugfix: optimize PGN output
+	* bugfix: enable leading comment in mainline and variations
+	* bugfix: slightly improve PGN export formatting
+	* feature: allow creating new PGN databases
+	* change: drop CXD databases support
+	* bugfix: guess move only with mouse over the board
+	* feature: truncate from the beginning
+	* bugfix: correct tag order for QuickSearch
+	* feature: search games by number or number range
+	* bugfix: do not read a game beyong the end of file
+	* feature: allow editing pre-move comments
+	* bugfix: PGN standard compliant ep square in FEN
+	* bugfix: reparent some dialogs
+	* bugfix: remove flickering at startup
+	* feature: make comments editable
+	* feature: correctly read PGNs with FEN
+	* feature: new Leipzig theme
+	* feature: allow removing variations
+	* feature: enable HTML export
+	* feature: allow setting small fonts in chess text widgets (useful for laptops).
+	* bugfix: save all PGN tags
+	* bugfix: display correct move number in starting position
+	* feature: allow copying games between databases
+	* feature: allow copying pieces in BoardSetup by using Ctrl
+	* change: add Advanced setting to BoardSetup
+	* feature: PlayerInfo dialog with player statistics
+	* feature: display FEN in BoardSetup
+	* feature: copy/paste position in BoardSetup
+	* bugfix: correctly recognize promotions in UCI engines
+	* bugfix: correctly handle promotion in tablebases
+	* bugfix: support 1/2 as a draw symbol
+
+Wed 13 Jun 2007 19:47:32 CET	Version 0.5
+
+	* feature: engine analysis
+	* feature: Opening Tree
+	* feature: Setup Position dialog enhancements
+	* feature: use ECO information to guess moves
+	* feature: option to combine searches
+	* feature: enable translations
+	* feature: make frame color configurable
+	* feature: remove last move with right click
+	* feature: remember matching position in position search
+	* feature: improve layout of Game Info
+	* feature: display game length in Game List
+	* feature: remove last move with right-click
+	* feature: shortcuts for Game List and Game Text
+	* bugfix: fix move loading failure in large databases
+	* bugfix: open PGN files from command line
+	* bugfix: don't flood tablebase servers with too many requests
+	* bugfix: sometimes online tablebase wasn't used even if enabled
+	* bugfix: flip setup board if main board is flipped
+	* bugfix: various small fixes to move guesser
+	* bugfix: some errors in Game/tags handling
+	* bugfix: do not crash when loading random game from empty filter
+	* change: lower network usage for EGTB server
+	* change: new, much faster Board implementation
+	* change: much faster Tag search
+	* change: do not highlight first move in starting position
+	* change: redesign Board tab in Preferences dialog
+
+Wed 9 May 2007 18:59:47 CET	Version 0.4
+
+	* feature: new, much improved themes
+	* feature: move guesser
+	* feature: support for online tablebases
+	* feature: binary ECO file format (faster startup)
+	* feature: simple tag search dialog for single tag searches
+	* feature: improve look&feel and usability of Tip of the day
+	* feature: Apply button for Preferences dialog
+	* feature: configurable square highlight color
+	* bugfix: update theme when pieces are changed
+	* bugfix: fix some drag&drop problems
+	* bugfix: segfault when truncating moves from empty game
+	* bugfix: ask for promoted piece only for legal moves
+	* bugfix: allow variations in starting position
+	* bugfix: correctly redraw board frame
+	* bugfix: correctly show side to move in Setup Position dialog
+	* bugfix: fix rare bug when # symbol was displayed instead of +
+	* bugfix: correctly calculate hash value for en passant
+	* bugfix: re-enable FEN tag support
+	* change: optimize PGN loading (loads 10-20% faster)
+
+Mon 23 Apr 2007 18:59:47 CET	Version 0.3
+
+	* feature: display ECO information
+	* feature: move pieces by drag&drop
+	* feature: remove moves/variations and truncate moves
+	* feature: display side to move
+	* feature: position search
+	* feature: internal support for editable PGN databases (no GUI yet!)
+	* feature: export games in filter/all games to PGN
+	* feature: small sample player database (look for Adams)
+	* bugfix: fix incorrect SAN representation of en-passant moves
+	* bugfix: correctly calculate game length displayed in GameInfo
+	* bugfix: display empty game
+	* bugfix: more robust PGN parsing
+	* bugfix: Sun-Solaris compilation (patch by Atul)
+	* bugfix: some improvements to Windows installer
+	* bugfix: more usual PGN format (space after move number etc.)
+
+Thu 28 Feb 2007 00:59:47 CET	Version 0.2
+
+	* feature: highlight and display current move
+	* feature: add variations
+	* feature: support promotion when entering moves
+	* feature: redesign Setup Position to improve usability
+	* feature: check board validity in Setup position dialog
+	* bugfix: correctly display move numbers for non-standard games
+	* bugfix: keep move number and side to move when setting position
+	* bugfix: copy/paste move number to/from FEN
+	* bugfix: accept non-standard castling (0-0 instead of O-O)
+	* bugfix: correctly draw large boards in unscaled pixmap mode
+	* bugfix: insert all pieces in given color in Setup Position
+	* bugfix: fix segfault when removing piece from empty square
+	* bugfix: correctly finding installed data path on Debian.
+	* change: clean configuration file format
