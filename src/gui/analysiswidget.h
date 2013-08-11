@@ -31,7 +31,11 @@ public:
 
     /** Get the main line */
     Analysis getMainLine() const;
+    void setLines(int lines);
 
+    int FindVariationIndexByMove(const QString &alg);
+    Analysis *FindAnalysisByMove(const QString &alg);
+    Analysis *GetBest(bool forWhite = true);
 public slots:
 	/** Sets new position. If analysis is active, the current content will be cleared and
 	new analysis will be performed. */
@@ -46,6 +50,9 @@ public slots:
     void slotVisibilityChanged(bool);
 	/** Is any engine running. */
 	bool isEngineRunning() const;
+
+    /** Number of visible lines was changed. */
+    void slotMpvChanged(int mpv);
 private slots:
 	/** Stop if analysis is no longer visible. */
 	void toggleAnalysis();
@@ -59,14 +66,15 @@ private slots:
     void engineError(QProcess::ProcessError);
 	/** Add variation. */
 	void slotLinkClicked(const QUrl& link);
-	/** Number of visible lines was changed. */
-	void slotMpvChanged(int mpv);
 	/** Show tablebase move information. */
 	void showTablebaseMove(Move move, int score);
+
 
 signals:
 	void addVariation(const Analysis& analysis);
     void addVariation(const QString& san);
+
+
 private:
 	/** Should analysis be running. */
 	bool isAnalysisEnabled() const;

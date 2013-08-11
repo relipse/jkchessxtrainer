@@ -23,9 +23,9 @@
 #include <stdio.h>
 #include <ctype.h>
 
-static uint hashVal [16][64];
-static uint stdStartHash = 0;
-static uint stdStartPawnHash = 0;
+static Guess::uint hashVal [16][64];
+static Guess::uint stdStartHash = 0;
+static Guess::uint stdStartPawnHash = 0;
 
 // HASH and UNHASH are identical: XOR the hash value for a (piece,square).
 #define HASH(h,p,sq)    (h) ^= hashVal[(p)][(sq)]
@@ -90,8 +90,8 @@ initHashValues (void)
 
 
     // First, set all values to 0:
-    uint sq;
-    for (uint p = 0; p < 16; p++) {
+    Guess::uint sq;
+    for (Guess::uint p = 0; p < 16; p++) {
         for (sq = A1; sq <= H8; sq++) { hashVal[p][sq] = 0; }
     }
 
@@ -112,7 +112,7 @@ initHashValues (void)
     for (sq=A1; sq <= H8; ++sq) { hashVal[BP][sq] = *hash; ++hash; }
 
     // Compute the hash values for the standard starting position:
-    uint h = 0;
+    Guess::uint h = 0;
     // First the pawns:
     HASH (h,WP,A2);  HASH (h,WP,B2);  HASH (h,WP,C2);  HASH (h,WP,D2);
     HASH (h,WP,E2);  HASH (h,WP,F2);  HASH (h,WP,G2);  HASH (h,WP,H2);
@@ -141,7 +141,7 @@ Position::AssertPos ()
 {
     byte mat[16] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
     for (colorT c = WHITE; c <= BLACK; ++c) {
-        for (uint i=0; i < Count[c]; ++i) {
+        for (Guess::uint i=0; i < Count[c]; ++i) {
             if (ListPos[List[c][i]] != i
                   ||  piece_Color(Board[List[c][i]]) != c) {
                 DumpBoard (stderr);
@@ -151,7 +151,7 @@ Position::AssertPos ()
             mat[Board[List[c][i]]]++;
         }
     }
-    for (uint i=WK; i < BP; i++) {
+    for (Guess::uint i=WK; i < BP; i++) {
         if (mat[i] != Material[i]) {
             DumpBoard (stderr);
             DumpLists (stderr);
@@ -520,10 +520,10 @@ Position::GenPawnMoves (MoveList * mlist, squareT from,
 // Position::GetHPSig():
 //      Return the position's home pawn signature.
 //
-uint
+Guess::uint
 Position::GetHPSig (void)
 {
-    uint hpSig = 0;
+    Guess::uint hpSig = 0;
     pieceT * b = &(Board[A2]);
     if (*b == WP) { hpSig |= 0x8000; }  b++;  /* a2 */
     if (*b == WP) { hpSig |= 0x4000; }  b++;  /* b2 */
@@ -794,7 +794,7 @@ Position::GenerateMoves (MoveList * mlist, pieceT pieceType,
     bool genNonCaptures = ((genType & GEN_NON_CAPS) != 0);
     bool capturesOnly = !genNonCaptures;
 
-    uint mask = 0;
+    Guess::uint mask = 0;
     if (pieceType != EMPTY) {
         mask = 1 << pieceType;
     } else {
@@ -816,7 +816,7 @@ Position::GenerateMoves (MoveList * mlist, pieceT pieceType,
     // checking pieces are, unless the caller has passed maybeInCheck=false
     // indicating it is CERTAIN the side to move is not in check here.
 
-    uint numChecks = 0;
+    Guess::uint numChecks = 0;
     if (maybeInCheck) {
         SquareList checkSquares;
         numChecks = CalcNumChecks (GetKingSquare(ToMove), &checkSquares);
@@ -830,7 +830,7 @@ Position::GenerateMoves (MoveList * mlist, pieceT pieceType,
     // The side to move is NOT in check. Iterate over each non-king
     // piece, and then generate King moves last of all:
 
-    uint npieces = Count[ToMove];
+    Guess::uint npieces = Count[ToMove];
     for (uint x = 1; x < npieces; x++) {
         squareT sq = List[ToMove][x];
         pieceT p = Board[sq];
@@ -959,7 +959,7 @@ Position::IsLegalMove (simpleMoveT * sm) {
     squareT kingSq = (mover == KING) ? to : GetKingSquare(ToMove);
     colorT enemy = color_Flip(ToMove);
     DoSimpleMove (sm);
-    uint nchecks = CalcAttacks (enemy, kingSq, NULL);
+    Guess::uint nchecks = CalcAttacks (enemy, kingSq, NULL);
     UndoSimpleMove (sm);
     return (nchecks == 0);
 }
@@ -975,7 +975,7 @@ Position::IsLegalMove (simpleMoveT * sm) {
 void
 Position::MatchLegalMove (MoveList * mlist, pieceT mask, squareT target)
 {
-    uint x;
+    Guess::uint x;
 
     // This function isn't for Pawn or King moves!
     ASSERT (mask != PAWN  &&  mask != KING);
@@ -986,14 +986,14 @@ Position::MatchLegalMove (MoveList * mlist, pieceT mask, squareT target)
     }
     mlist->Clear();
 
-    uint count = 0;
-    uint total = Material[piece_Make(ToMove, mask)];
+    Guess::uint count = 0;
+    Guess::uint total = Material[piece_Make(ToMove, mask)];
 
     pieceT p, pt, captured;
     squareT kingSq = GetKingSquare(ToMove);
     directionT dir;
 
-    uint tryMove = 0;
+    Guess::uint tryMove = 0;
 
     // First, verify that the target square is empty or contains
     // an enemy piece:
@@ -1147,7 +1147,7 @@ Position::MatchPawnMove (MoveList * mlist, fyleT fromFyle, squareT to, pieceT pr
     // OK, now 'from' is the only possible from-square. Is the move legal?
     // We make the move on the board and see if the King is in check.
 
-    uint legal = 0;
+    Guess::uint legal = 0;
     if (fromFyle == toFyle) {
         // Not a capture:
 
@@ -1275,7 +1275,7 @@ Position::MatchKingMove (MoveList * mlist, squareT target)
     Board[target] = piece_Make(ToMove, KING);
     Board[kingSq] = EMPTY;
     if (captured != EMPTY) { Material[captured]--; }
-    uint legal = 0;
+    Guess::uint legal = 0;
     if (CalcNumChecks(target) == 0) { legal = 1; }
     if (captured != EMPTY) { Material[captured]++; }
     Board[target] = captured;
@@ -1297,7 +1297,7 @@ void
 Position::GenCheckEvasions (MoveList * mlist, pieceT mask, genMovesT genType,
                             SquareList * checkSquares)
 {
-    uint numChecks = checkSquares->Size();
+    Guess::uint numChecks = checkSquares->Size();
     
     // Assert that king IS actually in check:    
     ASSERT (numChecks > 0);
@@ -1333,7 +1333,7 @@ Position::GenCheckEvasions (MoveList * mlist, pieceT mask, genMovesT genType,
         // the king, don't bother since it cannot possibly block or
         // capture the piece that is giving check!
 
-        uint numPieces = Count[ToMove];
+        Guess::uint numPieces = Count[ToMove];
         for (uint p2 = 1; p2 < numPieces; ++p2) {
             squareT from = List[ToMove][p2];
             pieceT p2piece = Board[from];
@@ -1379,7 +1379,7 @@ Position::GenCheckEvasions (MoveList * mlist, pieceT mask, genMovesT genType,
 //      This allows us to move pieces quickly (altering only Board[] and
 //      Material[]) and detect whether they leave the king in check,
 //      without having to update other information.
-uint
+Guess::uint
 Position::CalcAttacks (colorT side, squareT target, SquareList * fromSquares)
 {
     // If squares is NULL, caller doesn't want a list of the squares of
@@ -1400,15 +1400,15 @@ Position::CalcAttacks (colorT side, squareT target, SquareList * fromSquares)
         queen = BQ; rook = BR; bishop = BB; knight = BN;
     }
 
-    uint numQueensRooks = Material[queen] + Material[rook];
-    uint numQueensBishops = Material[queen] + Material[bishop];
+    Guess::uint numQueensRooks = Material[queen] + Material[rook];
+    Guess::uint numQueensBishops = Material[queen] + Material[bishop];
 
     // We only bother if there are any sliding pieces of each type:
     if (numQueensRooks > 0) {
         fyleT fyle = square_Fyle (target);
         rankT rank = square_Rank (target);
         directionT dirs[4];
-        uint ndirs = 0;
+        Guess::uint ndirs = 0;
         if (FyleCount(queen,fyle) + FyleCount(rook,fyle) > 0) {
             dirs[ndirs++] = UP;  dirs[ndirs++] = DOWN;
         }
@@ -1443,7 +1443,7 @@ Position::CalcAttacks (colorT side, squareT target, SquareList * fromSquares)
         leftDiagT left = square_LeftDiag (target);
         rightDiagT right = square_RightDiag (target);
         directionT dirs[4];
-        uint ndirs = 0;
+        Guess::uint ndirs = 0;
         if (LeftDiagCount(queen,left) + LeftDiagCount(bishop,left) > 0) {
             dirs[ndirs++] = UP_LEFT;  dirs[ndirs++] = DOWN_RIGHT;
         }
@@ -1532,7 +1532,7 @@ Position::IsKingInCheckDir (directionT dir)
     pieceT slider = piece_Make (enemy, (isDiagonal ? BISHOP : ROOK));
 
     // First, make sure the enemy has sliding pieces that could give check:
-    uint nSliders = PieceCount(queen) + PieceCount(slider);
+    Guess::uint nSliders = PieceCount(queen) + PieceCount(slider);
     if (nSliders == 0) { return false; }
 
     // Now make sure the enemy has a sliding piece on the appropriate
@@ -1653,11 +1653,11 @@ Position::IsKingInCheck (simpleMoveT * sm)
 // Position::Mobility
 //    Returns the number of squares a rook or bishop of the specified
 //    color would attack from the specified square.
-uint
+Guess::uint
 Position::Mobility (pieceT p, colorT color, squareT from)
 {
     ASSERT (p == ROOK  ||  p == BISHOP);
-    uint mobility = 0;
+    Guess::uint mobility = 0;
     directionT rookDirs[4] = { UP, DOWN, LEFT, RIGHT };
     directionT bishopDirs[4]
         = { UP_LEFT, UP_RIGHT, DOWN_LEFT, DOWN_RIGHT };
@@ -1698,12 +1698,12 @@ Position::SmallestDefender (colorT color, squareT target)
 {
     SquareList defenderSquares;
     pieceT defenders [16];
-    uint numDefenders = CalcAttacks (color, target, &defenderSquares);
+    Guess::uint numDefenders = CalcAttacks (color, target, &defenderSquares);
 
     // If the square is undefended, just return EMPTY:
     if (numDefenders == 0) { return EMPTY; }
 
-    uint i;
+    Guess::uint i;
     for (i=0; i < numDefenders; ++i) {
        defenders[i] = Board[defenderSquares.Get(i)];
     }
@@ -1739,7 +1739,7 @@ bool
 Position::IsKingInMate (void)
 {
     SquareList checkSquares;
-    uint numChecks = CalcNumChecks (GetKingSquare(ToMove), &checkSquares);
+    Guess::uint numChecks = CalcNumChecks (GetKingSquare(ToMove), &checkSquares);
     if (numChecks == 0) { return false; }
     CalcPins ();
     MoveList mlist;
@@ -2065,7 +2065,7 @@ Position::RelocatePiece (squareT fromSq, squareT toSq)
     }
 
     // Locate the piece index in the appropriate list of pieces:
-    uint index = ListPos[fromSq];
+    Guess::uint index = ListPos[fromSq];
     ASSERT(List[pcolor][index] == fromSq);
 
     // Relocate the piece:
@@ -2097,11 +2097,11 @@ Position::RelocatePiece (squareT fromSq, squareT toSq)
 //    Rook: 5
 //    Bishop, Knight: 3 each
 //    Pawn: 1
-uint
+Guess::uint
 Position::MaterialValue (colorT c)
 {
     ASSERT (c == WHITE  ||  c == BLACK);
-    uint value = 0;
+    Guess::uint value = 0;
     if (c == WHITE) {
         value += 9 * PieceCount(WQ);
         value += 5 * PieceCount(WR);
@@ -2248,7 +2248,7 @@ Position::ReadCoordMove (simpleMoveT * m, const char * str, bool reverse)
     squareT from, to;
     pieceT promo = EMPTY;
 
-    uint slen = strLength(str);
+    Guess::uint slen = strLength(str);
     if (slen == 5) {
         promo = piece_FromChar(toupper(str[4]));
     } else if (slen != 4) { return ERROR_InvalidMove; }
@@ -2314,7 +2314,7 @@ Position::ReadMove (simpleMoveT * m, const char * str, tokenT token)
 
     // Strip out 'x', '-', etc leaving just pieces, files and ranks:
     char * s2 = mStr;
-    uint slen = 0;
+    Guess::uint slen = 0;
     while (!isspace(*s)  &&  *s != '\0') {
         if ((isalpha(*s)  && (*s != 'x'))  ||  isdigit(*s)  ||  *s == '=') {
             *s2 = *s;  s2++;  slen++;
@@ -2430,8 +2430,8 @@ Position::ReadMove (simpleMoveT * m, const char * str, tokenT token)
         MatchLegalMove (&mlist, p, to);
     }
 
-    uint i;
-    uint matchCount = 0;
+    Guess::uint i;
+    Guess::uint matchCount = 0;
     for (i=0; i < mlist.Size(); i++) {
         // We need to check: (a) that to-square matches, and
         //    (b), that from-square matches any ambiguity indicator.
@@ -2461,7 +2461,7 @@ Position::ParseMove (simpleMoveT * sm, const char * line)
     const char * s;
     char * s2;
     char mStr [255];
-    uint length = 0;
+    Guess::uint length = 0;
     tokenT token = TOKEN_Invalid;
     errorT err = OK;
 
@@ -2525,7 +2525,7 @@ Position::ReadLine (const char * line)
     const char * s = line;
     char mStr[255];
     char * s2;
-    uint length = 0;
+    Guess::uint length = 0;
     simpleMoveT sm;
     tokenT token = TOKEN_Invalid;
     errorT err;
@@ -2665,7 +2665,7 @@ void
 Position::DumpLists (FILE * fp)
 {
     ASSERT (fp != NULL);
-    uint i;
+    Guess::uint i;
     for (colorT c = WHITE; c <= BLACK; ++c) {
         for (i=0; i < Count[c]; ++i) {
             pieceT p = Board[List[c][i]];
@@ -2723,7 +2723,7 @@ void
 Position::PrintCompactStr (char * cboard)
 {
     for (uint i=0; i < 32; ++i) {
-        uint i2 = i << 1;
+        Guess::uint i2 = i << 1;
         cboard[i] = (byte)(Board[i2] << 4) | Board[i2+1];
     }
     cboard[32] = 1 + ToMove;
@@ -2752,7 +2752,7 @@ void
 Position::PrintCompactStrFlipped (char * cboard)
 {
     for (uint i=0; i < 32; ++i) {
-        uint i2 = i << 1;
+        Guess::uint i2 = i << 1;
         // Flip 1st rank to 8th, etc:
         i2 = ((7 - (i2)/8) * 8 + ((i2) % 8));
         cboard[i] = (byte)(PIECE_FLIP[Board[i2]] << 4) |
@@ -2943,10 +2943,10 @@ Position::ReadFromFEN (const char * str)
 //              the halfmove clock and ply counter.
 //
 void
-Position::PrintFEN (char * str, uint flags)
+Position::PrintFEN (char * str, Guess::uint flags)
 {
     ASSERT (str != NULL);
-    uint emptyRun, iRank, iFyle;
+    Guess::uint emptyRun, iRank, iFyle;
     pieceT * pBoard = Board;
     for (iRank = 0; iRank < 8; ++iRank) {
         pBoard = &(Board[(7 - iRank) * 8]);
@@ -3014,24 +3014,24 @@ Position::PrintFEN (char * str, uint flags)
 
 struct htmlStyleT {
     const char * dir;  // directory containing images.
-    uint width;        // width value specified in <img> tag.
-    uint height;       // height value specified in <img> tag.
+    Guess::uint width;        // width value specified in <img> tag.
+    Guess::uint height;       // height value specified in <img> tag.
     bool transparent;  // True if the style uses transparent images,
                        // with square colors set by "bgcolor".
 };
 
 void
-Position::DumpHtmlBoard (QString * dstr, uint style, const char * dir, bool flip)
+Position::DumpHtmlBoard (QString * dstr, Guess::uint style, const char * dir, bool flip)
 {
-    const uint HTML_DIAG_STYLES = 2;
+    const Guess::uint HTML_DIAG_STYLES = 2;
     htmlStyleT hs [HTML_DIAG_STYLES];
     hs[0].dir = "bitmaps"; hs[0].width = 40; hs[0].height = 40;
     hs[1].dir = "bitmaps2"; hs[1].width = 36; hs[1].height = 35;
     if (style >= HTML_DIAG_STYLES) { style = 0; }
 
-    uint width = hs[style].width;
-    uint height = hs[style].height;
-    uint iRank, iFyle;
+    Guess::uint width = hs[style].width;
+    Guess::uint height = hs[style].height;
+    Guess::uint iRank, iFyle;
     pieceT * pBoard;
     if (dir == NULL) { dir = hs[style].dir; }
 
@@ -3099,7 +3099,7 @@ Position::DumpHtmlBoard (QString * dstr, uint style, const char * dir, bool flip
 void
 Position::DumpLatexBoard (QString * dstr, bool flip)
 {
-    uint iRank, iFyle;
+    Guess::uint iRank, iFyle;
     pieceT * pBoard;
     dstr->append ("\\board{");
     for (iRank = 0; iRank < 8; ++iRank) {
@@ -3152,7 +3152,7 @@ Position::CopyFrom (Position * src)
     };
     Count[WHITE] = src->Count[WHITE];
     Count[BLACK] = src->Count[BLACK];
-    uint i;
+    Guess::uint i;
     for (i=0; i < 64; ++i) { ListPos[i] = src->ListPos[i]; }
     for (i=0; i < 16; ++i) {
         Material[i] = src->Material[i];
@@ -3183,12 +3183,12 @@ Position::CopyFrom (Position * src)
 // Position::GetSquares
 //    Adds to the provided square list all squares containing the specified
 //    piece, and return the number of pieces of that type on the board.
-uint
+Guess::uint
 Position::GetSquares (pieceT piece, SquareList * sqlist)
 {
     colorT color = piece_Color(piece);
     squareT * squares = GetList(color);
-    uint npieces = GetCount(color);
+    Guess::uint npieces = GetCount(color);
     for (uint i=0; i < npieces; i++) {
         squareT sq = squares[i];
         pieceT p = Board[sq];
@@ -3211,8 +3211,8 @@ errorT
 Position::Random (const char * material)
 {
     pieceT pieces [32];         // List of pieces excluding kings
-    uint nPieces[2] = {0, 0};   // Number of pieces per side excluding kings.
-    uint total = 0;             // Total number of pieces excluding kings.
+    Guess::uint nPieces[2] = {0, 0};   // Number of pieces per side excluding kings.
+    Guess::uint total = 0;             // Total number of pieces excluding kings.
 
     colorT side = WHITE;
 

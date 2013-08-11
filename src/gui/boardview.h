@@ -81,7 +81,7 @@ signals:
     void moveMade(Square from, Square to, int button);
 	/** User dragged and dropped a piece holding Control */
 	void copyPiece(Square from, Square to);
-    /** User dragged and dropped a piece holding Control */
+    /** User made an illegal move */
     void invalidMove(Square from);
 	/** User clicked square */
     void clicked(Square square, int button, QPoint pos, Square from);

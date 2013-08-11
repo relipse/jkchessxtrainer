@@ -13,7 +13,7 @@ static { # Everything below takes effect with CONFIG += static
     message("Static build.")
 }
 
-DEFINES += QUAZIP_STATIC
+#DEFINES += QUAZIP_STATIC
 DEFINES += QT_NO_CAST_TO_ASCII
 DEFINES *= QT_USE_QSTRINGBUILDER
 
@@ -119,22 +119,22 @@ HEADERS += src/database/board.h \
     src/gui/engineoptionlist.h \
     src/gui/helpbrowser.h \
     src/database/downloadmanager.h \
-    src/quazip/zip.h \
-    src/quazip/unzip.h \
-    src/quazip/quazipnewinfo.h \
-    src/quazip/quazipfileinfo.h \
-    src/quazip/quazipfile.h \
-    src/quazip/quazipdir.h \
-    src/quazip/quazip.h \
-    src/quazip/quazip_global.h \
-    src/quazip/quaziodevice.h \
-    src/quazip/quagzipfile.h \
-    src/quazip/quacrc32.h \
-    src/quazip/quachecksum32.h \
-    src/quazip/quaadler32.h \
-    src/quazip/JlCompress.h \
-    src/quazip/ioapi.h \
-    src/quazip/crypt.h \
+#    src/quazip/zip.h \
+#    src/quazip/unzip.h \
+#    src/quazip/quazipnewinfo.h \
+#    src/quazip/quazipfileinfo.h \
+#    src/quazip/quazipfile.h \
+#    src/quazip/quazipdir.h \
+#    src/quazip/quazip.h \
+#    src/quazip/quazip_global.h \
+#    src/quazip/quaziodevice.h \
+#    src/quazip/quagzipfile.h \
+#    src/quazip/quacrc32.h \
+#    src/quazip/quachecksum32.h \
+#    src/quazip/quaadler32.h \
+#    src/quazip/JlCompress.h \
+#    src/quazip/ioapi.h \
+#    src/quazip/crypt.h \
     src/gui/toolmainwindow.h \
     src/gui/playerlistwidget.h \
     src/gui/qled.h \
@@ -217,18 +217,18 @@ SOURCES += src/database/board.cpp \
     src/gui/engineoptionlist.cpp \
     src/gui/helpbrowser.cpp \
     src/database/downloadmanager.cpp \
-    src/quazip/quazipnewinfo.cpp \
-    src/quazip/quazipfile.cpp \
-    src/quazip/quazipdir.cpp \
-    src/quazip/quazip.cpp \
-    src/quazip/quaziodevice.cpp \
-    src/quazip/quagzipfile.cpp \
-    src/quazip/quacrc32.cpp \
-    src/quazip/quaadler32.cpp \
-    src/quazip/qioapi.cpp \
-    src/quazip/JlCompress.cpp \
-    src/quazip/zip.c \
-    src/quazip/unzip.c \
+#    src/quazip/quazipnewinfo.cpp \
+#    src/quazip/quazipfile.cpp \
+#    src/quazip/quazipdir.cpp \
+#    src/quazip/quazip.cpp \
+#    src/quazip/quaziodevice.cpp \
+#    src/quazip/quagzipfile.cpp \
+#    src/quazip/quacrc32.cpp \
+#    src/quazip/quaadler32.cpp \
+#    src/quazip/qioapi.cpp \
+#    src/quazip/JlCompress.cpp \
+#    src/quazip/zip.c \
+#    src/quazip/unzip.c \
     src/gui/toolmainwindow.cpp \
     src/gui/playerlistwidget.cpp \
     src/gui/qled.cpp \
@@ -243,15 +243,15 @@ TEMPLATE = app
 INCLUDEPATH += src/database
 INCLUDEPATH += src/guess
 INCLUDEPATH += src/gui
-INCLUDEPATH += src/quazip
+#INCLUDEPATH += src/quazip
 INCLUDEPATH += $$[QT_INSTALL_PREFIX]/src/3rdparty/zlib
 
 win32 {
     # Whereever zlib is installed on Windows
     # Strange enough, on Mac OS this is found automagically by Qt
-    DEFINES += ZLIB_WINAPI
-    LIBS += -lz
-    INCLUDEPATH += /Qt/Qt5.0.1/5.0.1/Src/3rdparty/zlib
+#    DEFINES += ZLIB_WINAPI
+#    LIBS += -lz
+#    INCLUDEPATH += /Qt/Qt5.0.1/5.0.1/Src/3rdparty/zlib
 }
 
 UI_DIR = src/generated

@@ -33,8 +33,8 @@
 #include "pgndatabase.h"
 #include "playerlistwidget.h"
 #include "preferences.h"
-#include "quazip.h"
-#include "quazipfile.h"
+//#include "quazip.h"
+//#include "quazipfile.h"
 #include "savedialog.h"
 #include "settings.h"
 #include "tablebase.h"
@@ -566,7 +566,7 @@ bool MainWindow::gameMoveBy(int change)
 {
     if (game().moveByPly(change))
     {
-        if (m_training->isChecked())
+        if (m_hero->isChecked() || m_training->isChecked())
         {
             slotGameChanged();
         }
@@ -677,44 +677,45 @@ void MainWindow::openDatabaseArchive(QString fname, bool utf8)
 
         if (!fname.isEmpty())
         {
-            QuaZip zip(fname);
-            if (zip.open(QuaZip::mdUnzip))
-            {
-                // first, we need some information about archive itself
-                QString comment=zip.getComment();
-                // and now we are going to access files inside it
-                QuaZipFile file(&zip);
-                for(bool more=zip.goToFirstFile(); more; more=zip.goToNextFile())
-                {
-                    file.open(QIODevice::ReadOnly);
-                    QString outName = dir + "/" + file.getActualFileName();
-                    QDir pathOut;
-                    outName = pathOut.absoluteFilePath(outName);
-                    if (!QFile::exists(outName))
-                    {
-                        QDir().mkpath(dir);
+              //QUAZIP is disabled because zlib doesn't work on windows
+//            QuaZip zip(fname);
+//            if (zip.open(QuaZip::mdUnzip))
+//            {
+//                // first, we need some information about archive itself
+//                QString comment=zip.getComment();
+//                // and now we are going to access files inside it
+//                QuaZipFile file(&zip);
+//                for(bool more=zip.goToFirstFile(); more; more=zip.goToNextFile())
+//                {
+//                    file.open(QIODevice::ReadOnly);
+//                    QString outName = dir + "/" + file.getActualFileName();
+//                    QDir pathOut;
+//                    outName = pathOut.absoluteFilePath(outName);
+//                    if (!QFile::exists(outName))
+//                    {
+//                        QDir().mkpath(dir);
 
-                        QFile out(outName);
-                        if (out.open(QIODevice::WriteOnly))
-                        {
-                            out.write(file.readAll());
-                            out.close();
-                            openDatabaseFile(outName, utf8);
-                        }
-                        else
-                        {
-                            qDebug() << "File Error: " << out.error();
-                        }
-                    }
-                    else
-                    {
-                        openDatabaseFile(outName, utf8);
-                    }
+//                        QFile out(outName);
+//                        if (out.open(QIODevice::WriteOnly))
+//                        {
+//                            out.write(file.readAll());
+//                            out.close();
+//                            openDatabaseFile(outName, utf8);
+//                        }
+//                        else
+//                        {
+//                            qDebug() << "File Error: " << out.error();
+//                        }
+//                    }
+//                    else
+//                    {
+//                        openDatabaseFile(outName, utf8);
+//                    }
 
-                    file.close();
-                }
-                zip.close();
-            }
+//                    file.close();
+//                }
+//                zip.close();
+//            }
         }
     }
 }
@@ -1052,6 +1053,11 @@ void MainWindow::setupActions()
     m_training = createAction(tr("Training"), SLOT(slotToggleTraining()), Qt::CTRL + Qt::Key_R);
     m_training->setCheckable(true);
     gameMenu->addAction(m_training);
+
+    m_hero = createAction(tr("Hero"), SLOT(slotToggleHero()), Qt::CTRL + Qt::Key_H);
+    m_hero->setCheckable(true);
+    gameMenu->addAction(m_hero);
+
 
     m_autoPlay = createAction(tr("Auto Player"), SLOT(slotToggleAutoPlayer()), Qt::CTRL + Qt::SHIFT + Qt::Key_R, gameToolBar, ":/images/replay.png");
     m_autoPlay->setCheckable(true);

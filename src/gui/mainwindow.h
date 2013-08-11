@@ -64,6 +64,8 @@ public:
 
     static const int MaxRecentFiles = 10;
 
+    bool heroNextGame();
+    void computerPlayBestMove();
 protected:
 	/** QObjects Eventfilter for QApplication events */
 	bool eventFilter(QObject *obj, QEvent *event);
@@ -256,6 +258,12 @@ public slots:
 	void slotSearchReset();
     /** Training mode */
     void slotToggleTraining();
+
+    /** Hero mode */
+    void slotToggleHero();
+
+    int HeroPositionAnalysis();
+
     /** Toggle filter */
     void slotToggleFilter();
     /** Reverse current filter */
@@ -469,10 +477,17 @@ private:
     Square m_annotationSquare;
     Square m_annotationSquareFrom;
     QAction* m_training;
+    QAction* m_hero;
     QAction* m_autoPlay;
     QAction* m_autoAnalysis;
     QUndoGroup m_undoGroup;
     QNetworkAccessManager* m_manager;
+
+
+    QString m_lastMove;
+    int m_lastMoveScore;
+    QString m_lastBestMove;
+    int m_lastBestMoveScore;
 };
 
 

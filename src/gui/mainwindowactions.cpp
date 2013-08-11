@@ -474,6 +474,28 @@ void MainWindow::slotHelpBug()
 	QDesktopServices::openUrl(QUrl("http://sourceforge.net/tracker/?group_id=163833&atid=829300"));
 }
 
+void MainWindow::computerPlayBestMove(){
+    Analysis* a = m_mainAnalysis->GetBest(game().board().toMove() == White);
+    if (a){
+        Move m(game().board().parseMove(a->variation().at(0).toAlgebraic()));
+        if (m.isLegal()){
+            if (game().atLineEnd())
+            {
+                game().addMove(m);
+            }else{
+                //if we are in the middle of a variation
+                game().addVariation(m);
+                game().forward();
+            }
+            slotGameChanged();
+        }else{
+            MessageDialog::information(tr("Illegal move from computer"));
+        }
+        //parseMove
+    }else{
+        MessageDialog::information(tr("Best move not found, try waiting a bit longer"), tr("Best move not found"));
+    }
+}
 
 void MainWindow::slotBoardMove(Square from, Square to, int button)
 {
@@ -495,6 +517,38 @@ void MainWindow::slotBoardMove(Square from, Square to, int button)
             m.setPromotionPiece(promotionPiece);
         }
 
+        //we are in hero mode, which means you can only play moves
+        //which are listed on the computer variation
+        bool heroModeAndComputerMove = false;
+
+        m_lastMove = m.toAlgebraic();
+        m_lastMoveScore = game().board().toMove() == White ? -9999 : 9999;
+        if (m_hero->isChecked()){
+            Analysis* a = m_mainAnalysis->FindAnalysisByMove(m.toAlgebraic());
+            Analysis* abm = m_mainAnalysis->GetBest(game().board().toMove() == White);
+            m_lastBestMove = "";
+            m_lastBestMoveScore = 0;
+
+            if (abm){
+                m_lastBestMoveScore = abm->score();
+                m_lastBestMove = abm->variation().at(0).toAlgebraic();
+            }
+
+            if (a){
+                heroModeAndComputerMove = true;
+                m_lastMoveScore = a->score();
+                QString bm = "";
+
+
+                if (a == abm){
+                        bm = " You played the Best Move!!! ";
+                }
+
+                //QMessageBox::information(0, "Score!", tr("You scored ") + QString::number(a->score()) + bm);
+            }
+        }
+
+
         // Use an existing move with the correct promotion piece type if it already exists
         if( game().findNextMove(from,to,promotionPiece))
         {
@@ -507,9 +561,17 @@ void MainWindow::slotBoardMove(Square from, Square to, int button)
             else
             {
                 slotGameChanged();
+                if (m_hero->isChecked()){
+                    //disable game board until hero analysys is complete
+                    m_boardView->setDisabled(true);
+                    startOperation(tr("Analyzing %1").arg(m.toAlgebraic()));
+                    QTimer::singleShot(5000, this, SLOT(HeroPositionAnalysis()));
+                }
                 return;
             }
         }
+
+
 
         if (!m_training->isChecked())
         {
@@ -538,6 +600,13 @@ void MainWindow::slotBoardMove(Square from, Square to, int button)
             }
         }
 		slotGameChanged();
+        if (m_hero->isChecked()){
+            //disable game board until hero analysys is complete
+            m_boardView->setDisabled(true);
+            startOperation(tr("Analyzing %1...").arg(m.toAlgebraic()));
+            slotOperationProgress(25);
+            QTimer::singleShot(5000, this, SLOT(HeroPositionAnalysis()));
+        }
 	}
 }
 
@@ -835,7 +904,13 @@ void MainWindow::slotDatabaseModified()
 
 bool MainWindow::slotGameSave()
 {
-	if (database()->isReadOnly())
+    if (m_hero->isChecked()){
+        //do not save while in hero mode
+        //rather save the statistics to some sort of statistics file
+        return true;
+    }
+
+    if (database()->isReadOnly())
     {
 		MessageDialog::error(tr("This database is read only."));
         game().setModified(false); // Do not notify more than once
@@ -1070,6 +1145,112 @@ void MainWindow::slotGameRemoveVariations()
 void MainWindow::slotToggleTraining()
 {
     slotGameChanged();
+}
+
+bool MainWindow::heroNextGame()
+{
+    DatabaseInfo* curDBi = m_databases[m_currentDatabase];
+    if (!curDBi->loadGame(curDBi->currentIndex()+1)){
+       if (!curDBi->loadGame(0)){
+           QMessageBox::information(QApplication::activeWindow(), tr("Error Loading Game"), tr("Error loading next game"));
+           return false;
+       }
+    }
+    UpdateBoardInformation();
+
+    //play first move, so user knows last move
+    if (!slotGameMoveNext()){
+        //could not play first move,
+        QMessageBox::information(QApplication::activeWindow(), tr("Error Playing Move"), tr("Error playing next move in game"));
+    }
+
+    //make sure correct training on bottom
+    //flip board if black pieces
+    m_boardView->setFlipped(game().board().toMove() == Black);
+
+    m_mainAnalysis->show();
+    m_mainAnalysis->startEngine();
+    //analyze 4 potential lines
+    m_mainAnalysis->setLines(4);
+
+
+    //next await for user-move
+    //validate user-move with engine results
+    return true;
+}
+
+void MainWindow::slotToggleHero()
+{
+    slotGameChanged();
+    if (m_hero->isChecked()){
+        if (m_currentDatabase == -1 || m_databases[m_currentDatabase]->database()->count() == 0){
+           QMessageBox::information(QApplication::activeWindow(), tr("No Games"), tr("First load a database of games before entering Hero mode."));
+           m_hero->setChecked(false);
+           return;
+        }else{
+            m_boardView->setDbIndex(m_currentDatabase);
+            UpdateBoardInformation();
+        }
+        m_boardView->setFlags(BoardView::SuppressGuessMove);
+        heroNextGame();
+    }else{ //turning off hero mode
+       m_mainAnalysis->show();
+       m_mainAnalysis->stopEngine();
+       m_mainAnalysis->setLines(1);
+       m_boardView->setFlags(0);
+    }
+}
+
+int MainWindow::HeroPositionAnalysis()
+{
+    bool whiteToMove = game().board().toMove() == White;
+    bool playerIsWhite = !whiteToMove;
+    //play around with the handicap, the lower the value, the closer he needs to be to the best move
+    int handicap = 75;
+
+    //if it is white's move, that means we are looking for the lowest possible score (black's best)
+    //if it's black's move we are looking for the highest possible score
+
+    //the position was analyzed, now see if the last move played
+    m_boardView->setDisabled(false);
+    int score = m_mainAnalysis->getMainLine().score();
+    finishOperation(tr("Score: ") + QString::number(score)
+                               + ", last best: " + QString::number(m_lastBestMoveScore));
+    if (playerIsWhite){
+        if (score > m_lastBestMoveScore){
+            finishOperation(QString(" Better than the best!"));
+
+            heroNextGame();
+
+            //let the computer respond now
+            //computerPlayBestMove();
+        }else if (score > m_lastBestMoveScore - handicap){
+            finishOperation(QString(" Good Move!"));
+            heroNextGame();
+            //computerPlayBestMove();
+        }else{ //move not good enough, peform a takeback
+            game().backward();
+            slotGameChanged();
+            finishOperation(tr("Play a better move! Penalty: ") + QString("%1").arg(m_lastBestMoveScore - score));
+        }
+    }else{
+        if (score < m_lastBestMoveScore){
+            finishOperation(QString(" Better than the best!"));
+
+            heroNextGame();
+
+            //let the computer respond now
+            //computerPlayBestMove();
+        }else if (score < m_lastBestMoveScore + handicap){
+            finishOperation(QString(" Good Move!"));
+            heroNextGame();
+            //computerPlayBestMove();
+        }else{ //move not good enough, peform a takeback
+            game().backward();
+            slotGameChanged();
+            finishOperation(tr("Play a better move! Penalty: ") + QString("%1").arg(m_lastBestMoveScore - score));
+        }
+    }
 }
 
 void MainWindow::slotToggleAutoAnalysis()

@@ -190,6 +190,52 @@ void AnalysisWidget::slotLinkClicked(const QUrl& url)
     }
 }
 
+Analysis* AnalysisWidget::FindAnalysisByMove(const QString& alg){
+    int i = FindVariationIndexByMove(alg);
+    if (i != -1){
+        return &m_analyses[i];
+    }else{
+        return 0;
+    }
+}
+
+Analysis *AnalysisWidget::GetBest(bool forWhite)
+{
+    int best_score = forWhite ? -9999 : 9999;
+    Analysis* a = NULL;
+
+    for (int i = 0; i < m_analyses.count(); ++i ){
+        int score = m_analyses[i].score();
+        if (forWhite){
+            if (score > best_score){
+                best_score = score;
+                a = &m_analyses[i];
+            }else if (score == best_score){
+                //TODO: equal best score move, what to do?
+            }
+        }else{ //best score for black is a negative score
+            if (score < best_score){
+                best_score = score;
+                a = &m_analyses[i];
+            }else if (score == best_score){
+               //TODO: equal best score move, what to do?
+            }
+        }
+    }
+    return a;
+}
+
+int AnalysisWidget::FindVariationIndexByMove(const QString& alg){
+    for (int i = 0; i < m_analyses.count(); ++i ){
+       if (alg == m_analyses[i].variation().at(0).toAlgebraic()){
+           return i;
+       }
+    }
+    return -1;
+}
+
+
+
 void AnalysisWidget::slotMpvChanged(int mpv)
 {
 	if (isEngineRunning()) {
@@ -248,4 +294,9 @@ Analysis AnalysisWidget::getMainLine() const
         a = m_analyses.first();
     }
     return a;
+}
+
+void AnalysisWidget::setLines(int lines)
+{
+    ui.vpcount->setValue(lines);
 }
