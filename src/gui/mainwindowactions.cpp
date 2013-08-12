@@ -477,6 +477,7 @@ void MainWindow::slotHelpBug()
 }
 
 void MainWindow::computerPlayBestMove(){
+    if (m_heroNextOrPlayDlg){ m_heroNextOrPlayDlg->close(); }
     Analysis* a = m_mainAnalysis->GetBest(game().board().toMove() == White);
     if (a){
         Move m(game().board().parseMove(a->variation().at(0).toAlgebraic()));
@@ -497,6 +498,28 @@ void MainWindow::computerPlayBestMove(){
     }else{
         MessageDialog::information(tr("Best move not found, try waiting a bit longer"), tr("Best move not found"));
     }
+}
+
+void MainWindow::slotViewGame()
+{
+    //TODO: somehow display the game moves
+}
+
+void MainWindow::slotViewStats()
+{
+    MessageDialog::information(tr("Hero Training Score: %1").arg(m_heroScore));
+}
+
+void MainWindow::slotHeroConcedePosition()
+{
+    if (!m_hero->isChecked()){
+        MessageDialog::information(tr("Hero Training mode not enabled"));
+        return;
+    }
+    //Conceding a position essentially plays the best computer move as the player
+    m_heroScore -= 300;
+    computerPlayBestMove();
+    enableHeroButtonsBasedOnState(tr("Concede Penalty: 300"), 2);
 }
 
 void MainWindow::slotBoardMove(Square from, Square to, int button)
@@ -1151,6 +1174,7 @@ void MainWindow::slotToggleTraining()
 
 bool MainWindow::heroNextGame()
 {
+    if (m_heroNextOrPlayDlg){ m_heroNextOrPlayDlg->close(); }
     DatabaseInfo* curDBi = m_databases[m_currentDatabase];
     if (!curDBi->loadGame(curDBi->currentIndex()+1)){
        if (!curDBi->loadGame(0)){
@@ -1163,7 +1187,8 @@ bool MainWindow::heroNextGame()
     //play first move, so user knows last move
     if (!slotGameMoveNext()){
         //could not play first move,
-        QMessageBox::information(QApplication::activeWindow(), tr("Error Playing Move"), tr("Error playing next move in game"));
+        QMessageBox::information(QApplication::activeWindow(), tr("Error Playing Move"), tr("Error playing next move in game, something may be wrong with the pgn"));
+        return false;
     }
 
     //make sure correct training on bottom
@@ -1175,6 +1200,7 @@ bool MainWindow::heroNextGame()
     //analyze 4 potential lines
     m_mainAnalysis->setLines(4);
 
+    enableHeroButtonsBasedOnState(tr(""), 1);   //1 - awaiting next move
 
     //next await for user-move
     //validate user-move with engine results
@@ -1184,6 +1210,7 @@ bool MainWindow::heroNextGame()
 void MainWindow::slotToggleHero()
 {
     if (m_hero->isChecked()){
+        enableHeroButtonsBasedOnState(tr(""), 0);
         if (m_currentDatabase == -1 || m_databases[m_currentDatabase]->database()->count() == 0){
            slotFileOpen();
 
@@ -1198,12 +1225,30 @@ void MainWindow::slotToggleHero()
         heroNextGame();
         slotGameChanged();
     }else{ //turning off hero mode
+       enableHeroButtonsBasedOnState(tr(""), -1);
        m_mainAnalysis->show();
        m_mainAnalysis->stopEngine();
        m_mainAnalysis->setLines(1);
        m_boardView->setFlags(0);
     }
 }
+
+void MainWindow::HeroPopupDlg(const QString& header, const QString& message)
+{
+    if (!m_heroNextOrPlayDlg){
+        m_heroNextOrPlayDlg = new popHeroNextOrPlay();
+        connect(m_heroNextOrPlayDlg->ui->btnNextPosition,SIGNAL(clicked()), SLOT(heroNextGame()));
+        connect(m_heroNextOrPlayDlg->ui->btnContinuePlaying,SIGNAL(clicked()), SLOT(computerPlayBestMove()));
+    }
+    if (!header.isEmpty()){
+       m_heroNextOrPlayDlg->ui->lblHeader->setText(header);
+    }
+    if (!message.isEmpty()){
+       m_heroNextOrPlayDlg->ui->lblDescrip->setText(message);
+    }
+    m_heroNextOrPlayDlg->show();
+}
+
 
 int MainWindow::HeroPositionAnalysis()
 {
@@ -1216,48 +1261,44 @@ int MainWindow::HeroPositionAnalysis()
     //if it's black's move we are looking for the highest possible score
 
     //the position was analyzed, now see if the last move played
+
+    //re-enable the board
     m_boardView->setDisabled(false);
+    enableHeroButtonsBasedOnState(tr(""), 2);
     int score = m_mainAnalysis->getMainLine().score();
     finishOperation(tr("Score: ") + QString::number(score)
                                + ", last best: " + QString::number(m_lastBestMoveScore));
     if (playerIsWhite){
-        if (score > m_lastBestMoveScore){
-            finishOperation(QString(" Better than the best!"));
-
-
-            popHeroNextOrPlay* popNextOrPlay = new popHeroNextOrPlay();
-            popNextOrPlay->ui->lblHeader->setText("Better than engine picked!");
-            //connect(popNextOrPlay->ui->btnNextPosition,
-            popNextOrPlay->show();
-            heroNextGame();
-
-            //let the computer respond now
-            computerPlayBestMove();
+        if (score >= m_lastBestMoveScore){
+            finishOperation(QString("Better than the best!"));
+            HeroPopupDlg("Best Move!");
+            m_heroScore += abs(score);
         }else if (score > m_lastBestMoveScore - handicap){
-            finishOperation(QString(" Good Move!"));
-            heroNextGame();
-            //computerPlayBestMove();
+            finishOperation(QString("Good Move!"));
+            HeroPopupDlg("Good Move!");
+            m_heroScore += abs(score);
         }else{ //move not good enough, peform a takeback
             game().backward();
             slotGameChanged();
-            finishOperation(tr("Play a better move! Penalty: ") + QString("%1").arg(m_lastBestMoveScore - score));
+            enableHeroButtonsBasedOnState(tr(""), 0);
+            m_heroScore -= abs(m_lastBestMoveScore - score);
+            finishOperation(tr("Play a better move! Score: %1 Penalty: %2").arg(score).arg(m_lastBestMoveScore - score));
         }
-    }else{
+    }else{ //player is Black
         if (score < m_lastBestMoveScore){
             finishOperation(QString(" Better than the best!"));
-
-            heroNextGame();
-
-            //let the computer respond now
-            //computerPlayBestMove();
+            HeroPopupDlg("Best Move!");
+            m_heroScore += abs(score);
         }else if (score < m_lastBestMoveScore + handicap){
-            finishOperation(QString(" Good Move!"));
-            heroNextGame();
-            //computerPlayBestMove();
+            finishOperation(QString("Good Move!"));
+            HeroPopupDlg("Good Move!");
+            m_heroScore += abs(score);
         }else{ //move not good enough, peform a takeback
             game().backward();
             slotGameChanged();
-            finishOperation(tr("Play a better move! Penalty: ") + QString("%1").arg(m_lastBestMoveScore - score));
+            enableHeroButtonsBasedOnState(tr(""), 0);
+            m_heroScore -= abs(m_lastBestMoveScore - score);
+            finishOperation(tr("Play a better move! Score: %1 Penalty: %2").arg(score).arg(m_lastBestMoveScore - score));
         }
     }
 }

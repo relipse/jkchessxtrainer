@@ -39,6 +39,8 @@
 #include "tableview.h"
 #include "toolmainwindow.h"
 #include "version.h"
+#include "herotrainingwidget.h"
+#include "ui_herotrainingwidget.h"
 
 #include <time.h>
 
@@ -65,7 +67,9 @@ MainWindow::MainWindow() : QMainWindow(),
     m_autoPlayTimer(0),
     m_bGameChange(false),
     m_currentFrom(InvalidSquare),
-    m_currentTo(InvalidSquare)
+    m_currentTo(InvalidSquare),
+    m_heroNextOrPlayDlg(0),
+    m_heroScore(0) //TODO: do we load this from file instead?
 {
 	setObjectName("MainWindow");
 
@@ -173,6 +177,22 @@ MainWindow::MainWindow() : QMainWindow(),
 	m_menuView->addAction(gameListDock->toggleViewAction());
 	gameListDock->toggleViewAction()->setShortcut(Qt::CTRL + Qt::Key_L);
     connect(m_gameList, SIGNAL(raiseRequest()), gameListDock, SLOT(raise()));
+
+    //hero training mode
+    DockWidgetEx* heroModeDock = new DockWidgetEx(tr("Hero Training"), this);
+    heroModeDock->setObjectName("HeroTrainingMode");
+    m_heroTrainingWidget = new HeroTrainingWidget(this);
+    m_heroTrainingWidget->setMinimumSize(150, 100);
+    heroModeDock->setWidget(m_heroTrainingWidget);
+    addDockWidget(Qt::BottomDockWidgetArea, heroModeDock);
+    m_menuView->addAction(heroModeDock->toggleViewAction());
+    heroModeDock->toggleViewAction()->setShortcut(Qt::CTRL + Qt::ALT + Qt::Key_H);
+    connect(m_heroTrainingWidget->ui->btnConcede, SIGNAL(clicked()), SLOT(slotHeroConcedePosition()));
+    connect(m_heroTrainingWidget->ui->btnGame, SIGNAL(clicked()), SLOT(slotViewGame()));
+    connect(m_heroTrainingWidget->ui->btnNextPosition, SIGNAL(clicked()), SLOT(heroNextGame()));
+    connect(m_heroTrainingWidget->ui->btnStats, SIGNAL(clicked()), SLOT(slotViewStats()));
+    enableHeroButtonsBasedOnState(tr(""), -1);
+
 
     // Player List
     DockWidgetEx* playerListDock = new DockWidgetEx(tr("Players"), this);
@@ -369,6 +389,7 @@ MainWindow::MainWindow() : QMainWindow(),
 
 MainWindow::~MainWindow()
 {
+    delete m_heroNextOrPlayDlg;
     m_autoPlayTimer->stop();
     m_openingTreeWidget->cancel(false);
     foreach (DatabaseInfo* database, m_databases) {
@@ -1296,6 +1317,34 @@ void MainWindow::StartCheckUpdate()
         QNetworkRequest request(url);
         m_manager->get(request);
     }
+}
+
+//0 - hero mode just turned on, about to go to next state (1)
+//1 - awaiting player move
+//2 - after player moved or conceded
+void MainWindow::enableHeroButtonsBasedOnState(QString msg, int alsoSetState)
+{
+    //set the state if not -99
+    if (alsoSetState != -99){
+       m_heroModeState = alsoSetState;
+    }
+
+       m_heroTrainingWidget->ui->btnConcede->setEnabled(m_heroModeState == 1);
+       m_heroTrainingWidget->ui->btnGame->setEnabled(m_heroModeState == 2);
+       m_heroTrainingWidget->ui->btnNextPosition->setEnabled(m_heroModeState == 2);
+       if (m_heroNextOrPlayDlg){
+           m_heroNextOrPlayDlg->ui->btnContinuePlaying->setEnabled(m_heroModeState == 2);
+           m_heroNextOrPlayDlg->ui->btnNextPosition->setEnabled(m_heroModeState == 2);
+       }
+       if (msg == ""){
+           switch(m_heroModeState){
+               case -1: msg = "Hero Mode disabled, press CTRL+H to enable"; break;
+               case 0: msg = "Welcome to Hero Training Mode"; break;
+               case 1: msg = "Awaiting your move"; break;
+               case 2: msg = "Finished training position"; break;
+           }
+       }
+       m_heroTrainingWidget->ui->lblStatus->setText(msg);
 }
 
 void MainWindow::slotHttpDone(QNetworkReply *reply)

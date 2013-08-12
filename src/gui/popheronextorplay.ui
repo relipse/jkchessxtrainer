@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Hero Training Mode</string>
   </property>
   <widget class="QLabel" name="lblHeader">
    <property name="geometry">

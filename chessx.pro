@@ -36,7 +36,8 @@ FORMS += \
     src/gui/tagdetailwidget.ui \
     src/gui/renametagdialog.ui \
     src/gui/openingtreewidget.ui \
-    src/gui/popheronextorplay.ui
+    src/gui/popheronextorplay.ui \
+    src/gui/herotrainingwidget.ui
 
 HEADERS += src/database/board.h \
 	src/database/move.h \
@@ -128,7 +129,8 @@ HEADERS += src/database/board.h \
     src/gui/openingtreewidget.h \
     src/gui/ecolistwidget.h \
     src/database/ecoinfo.h \
-    src/gui/popheronextorplay.h
+    src/gui/popheronextorplay.h \
+    src/gui/herotrainingwidget.h
 
 SOURCES += src/database/board.cpp \
 	src/database/common.cpp \
@@ -211,7 +213,8 @@ SOURCES += src/database/board.cpp \
     src/gui/openingtreewidget.cpp \
     src/gui/ecolistwidget.cpp \
     src/database/ecoinfo.cpp \
-    src/gui/popheronextorplay.cpp
+    src/gui/popheronextorplay.cpp \
+    src/gui/herotrainingwidget.cpp
 
 TEMPLATE = app
 INCLUDEPATH += src/database

@@ -14,11 +14,13 @@
 #include "historylist.h"
 #include "move.h"
 #include "output.h"
-
+#include "popheronextorplay.h"
+#include "ui_popheronextorplay.h"
 #include <QtGui>
 #include <QAction>
 #include <QMainWindow>
 #include <QUndoGroup>
+#include "herotrainingwidget.h"
 
 class Analysis;
 class AnalysisWidget;
@@ -64,8 +66,8 @@ public:
 
     static const int MaxRecentFiles = 10;
 
-    bool heroNextGame();
-    void computerPlayBestMove();
+    /** Pop up dialog to Play or go to Next position **/
+    void HeroPopupDlg(const QString &header = tr(""), const QString& message = tr(""));
 protected:
 	/** QObjects Eventfilter for QApplication events */
 	bool eventFilter(QObject *obj, QEvent *event);
@@ -263,6 +265,10 @@ public slots:
     void slotToggleHero();
 
     int HeroPositionAnalysis();
+    bool heroNextGame();
+    void computerPlayBestMove();
+
+    void slotHeroConcedePosition();
 
     /** Toggle filter */
     void slotToggleFilter();
@@ -316,6 +322,8 @@ public slots:
     /** Pass a tag changing request from rename dialog to database */
     void slotRenameRequest(QString tag, QString newValue, QString oldValue);
 
+    void slotViewStats();
+    void slotViewGame();
 protected slots:
     /** Receiver for a failed loading of a database */
     void loadError(QUrl url);
@@ -488,6 +496,15 @@ private:
     int m_lastMoveScore;
     QString m_lastBestMove;
     int m_lastBestMoveScore;
+
+    popHeroNextOrPlay* m_heroNextOrPlayDlg;
+    HeroTrainingWidget* m_heroTrainingWidget;
+    //0 - hero mode just turned on, about to go to next state (1)
+    //1 - awaiting player move
+    //2 - after player moved or conceded
+    int m_heroModeState;
+    void enableHeroButtonsBasedOnState(QString msg = tr(""), int alsoSetState = -99);
+    int m_heroScore;
 };
 
 
