@@ -21,7 +21,7 @@
 #include <QMainWindow>
 #include <QUndoGroup>
 #include "herotrainingwidget.h"
-
+#include "ui_herotrainingwidget.h"
 class Analysis;
 class AnalysisWidget;
 class Board;
@@ -264,9 +264,10 @@ public slots:
     /** Hero mode */
     void slotToggleHero();
 
-    int HeroPositionAnalysis();
+    void HeroPositionAnalysis();
     bool heroNextGame();
     void computerPlayBestMove();
+    void slotTurnOffHero();
 
     void slotHeroConcedePosition();
 

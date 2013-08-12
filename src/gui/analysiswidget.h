@@ -36,6 +36,9 @@ public:
     int FindVariationIndexByMove(const QString &alg);
     Analysis *FindAnalysisByMove(const QString &alg);
     Analysis *GetBest(bool forWhite = true);
+
+    void setHideOutput(bool hide = true);
+    bool hideOutput() const;
 public slots:
 	/** Sets new position. If analysis is active, the current content will be cleared and
 	new analysis will be performed. */
@@ -88,6 +91,7 @@ private:
 	Board m_board;
 	QString m_tablebaseEvaluation;
 	Tablebase* m_tablebase;
+    bool m_hideOutput;
 };
 
 #endif // __ANALYSIS_WIDGET_H__

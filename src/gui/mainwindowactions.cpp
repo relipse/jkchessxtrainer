@@ -306,7 +306,7 @@ void MainWindow::UpdateGameText()
         if (m_showPgnSource)
             m_gameView->setPlainText(m_output->output(&game()));
         else
-            m_gameView->setText(m_output->output(&game(),m_training->isChecked()));
+            m_gameView->setText(m_output->output(&game(),m_training->isChecked() || m_hero->isChecked()));
     }
 }
 
@@ -500,6 +500,15 @@ void MainWindow::computerPlayBestMove(){
     }
 }
 
+void MainWindow::slotTurnOffHero()
+{
+    //this should trigger toggle
+    m_hero->setChecked(false);
+    if (m_heroNextOrPlayDlg){
+        m_heroNextOrPlayDlg->close();
+    }
+}
+
 void MainWindow::slotViewGame()
 {
     //TODO: somehow display the game moves
@@ -628,8 +637,10 @@ void MainWindow::slotBoardMove(Square from, Square to, int button)
         if (m_hero->isChecked()){
             //disable game board until hero analysys is complete
             m_boardView->setDisabled(true);
+            m_heroTrainingWidget->ui->lblStatus->setText(tr("Analyzing %1...").arg(m.toAlgebraic()));
             startOperation(tr("Analyzing %1...").arg(m.toAlgebraic()));
             slotOperationProgress(25);
+            //TODO: make progress bar look as if it is working for the next 5 seconds (5000 ms)
             QTimer::singleShot(5000, this, SLOT(HeroPositionAnalysis()));
         }
 	}
@@ -784,7 +795,7 @@ void MainWindow::slotGameVarDown()
         }
         else
         {
-           if (!m_training->isChecked())
+           if (!m_hero->isChecked() || !m_training->isChecked())
            {
               // Do not show next move in training mode
               game().forward();
@@ -803,7 +814,7 @@ void MainWindow::slotGameVarExit()
 			game().backward();
         }
         game().backward();
-        if (m_training->isChecked())
+        if (m_hero->isChecked() || m_training->isChecked())
         {
             slotGameChanged();
         }
@@ -1079,7 +1090,7 @@ void MainWindow::slotGameViewLink(const QUrl& url)
 		else if (url.path() == "exit") game().moveToId(game().parentMove());
 		else
 			game().moveToId(url.path().toInt());
-        if (m_training->isChecked())
+        if (m_hero->isChecked() || m_training->isChecked())
         {
             slotGameChanged();
         }
@@ -1089,7 +1100,7 @@ void MainWindow::slotGameViewLink(const QUrl& url)
         }
 	} else if (url.scheme() == "precmt" || url.scheme() == "cmt") {
 		game().moveToId(url.path().toInt());
-        if (m_training->isChecked())
+        if (m_hero->isChecked() || m_training->isChecked())
         {
             slotGameChanged();
         }
@@ -1210,6 +1221,12 @@ bool MainWindow::heroNextGame()
 void MainWindow::slotToggleHero()
 {
     if (m_hero->isChecked()){
+        //turn off training mode if it is on
+        if (m_training->isChecked()){
+            m_training->setChecked(false);
+        }
+        //we hide all analysis for hero mode
+        m_mainAnalysis->setHideOutput(true);
         enableHeroButtonsBasedOnState(tr(""), 0);
         if (m_currentDatabase == -1 || m_databases[m_currentDatabase]->database()->count() == 0){
            slotFileOpen();
@@ -1230,6 +1247,7 @@ void MainWindow::slotToggleHero()
        m_mainAnalysis->stopEngine();
        m_mainAnalysis->setLines(1);
        m_boardView->setFlags(0);
+       m_mainAnalysis->setHideOutput(false);
     }
 }
 
@@ -1239,6 +1257,7 @@ void MainWindow::HeroPopupDlg(const QString& header, const QString& message)
         m_heroNextOrPlayDlg = new popHeroNextOrPlay();
         connect(m_heroNextOrPlayDlg->ui->btnNextPosition,SIGNAL(clicked()), SLOT(heroNextGame()));
         connect(m_heroNextOrPlayDlg->ui->btnContinuePlaying,SIGNAL(clicked()), SLOT(computerPlayBestMove()));
+        connect(m_heroNextOrPlayDlg->ui->btnTurnOffHero, SIGNAL(clicked()), SLOT(slotTurnOffHero()));
     }
     if (!header.isEmpty()){
        m_heroNextOrPlayDlg->ui->lblHeader->setText(header);
@@ -1250,7 +1269,7 @@ void MainWindow::HeroPopupDlg(const QString& header, const QString& message)
 }
 
 
-int MainWindow::HeroPositionAnalysis()
+void MainWindow::HeroPositionAnalysis()
 {
     bool whiteToMove = game().board().toMove() == White;
     bool playerIsWhite = !whiteToMove;

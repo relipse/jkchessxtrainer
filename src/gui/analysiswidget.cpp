@@ -15,7 +15,7 @@
 #include "messagedialog.h"
 
 AnalysisWidget::AnalysisWidget()
-		: m_engine(0)
+    : m_engine(0), m_hideOutput(false)
 {
 	ui.setupUi(this);
 	connect(ui.engineList, SIGNAL(activated(int)), SLOT(toggleAnalysis()));
@@ -225,6 +225,16 @@ Analysis *AnalysisWidget::GetBest(bool forWhite)
     return a;
 }
 
+void AnalysisWidget::setHideOutput(bool hide)
+{
+    m_hideOutput = hide;
+}
+
+bool AnalysisWidget::hideOutput() const
+{
+    return m_hideOutput;
+}
+
 int AnalysisWidget::FindVariationIndexByMove(const QString& alg){
     for (int i = 0; i < m_analyses.count(); ++i ){
        if (alg == m_analyses[i].variation().at(0).toAlgebraic()){
@@ -277,11 +287,20 @@ void AnalysisWidget::showTablebaseMove(Move move, int score)
 void AnalysisWidget::updateAnalysis()
 {
 	QString text;
-	foreach (Analysis a, m_analyses)
-		text.append(a.toString(m_board) + "<br>");
+    foreach (Analysis a, m_analyses){
+        if (m_hideOutput){
+            text.append(tr("--") + "<br>");
+        }else{
+           text.append(a.toString(m_board) + "<br>");
+        }
+    }
 	if (!m_tablebaseEvaluation.isEmpty())
     {
-        text.append(tr("<a href=\"0\" title=\"Click to add move to game\">[+]</a> <b>Tablebase:</b> ") + m_tablebaseEvaluation);
+        if (m_hideOutput){
+            text.append("--");
+        }else{
+            text.append(tr("<a href=\"0\" title=\"Click to add move to game\">[+]</a> <b>Tablebase:</b> ") + m_tablebaseEvaluation);
+        }
     }
 	ui.variationText->setText(text);
 }
