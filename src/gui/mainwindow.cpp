@@ -1335,11 +1335,12 @@ void MainWindow::enableHeroButtonsBasedOnState(QString msg, int alsoSetState)
        if (m_heroNextOrPlayDlg){
            m_heroNextOrPlayDlg->ui->btnContinuePlaying->setEnabled(m_heroModeState == 2);
            m_heroNextOrPlayDlg->ui->btnNextPosition->setEnabled(m_heroModeState == 2);
+
        }
        if (msg == ""){
            switch(m_heroModeState){
                case -1: msg = "Hero Mode disabled, press CTRL+H to enable"; break;
-               case 0: msg = "Welcome to Hero Training Mode"; break;
+               case 0: msg = "Starting Hero Training Mode"; break;
                case 1: msg = "Awaiting your move"; break;
                case 2: msg = "Finished training position"; break;
            }
