@@ -16,11 +16,14 @@
 void MainWindow::slotHelpAbout()
 {
     QString version = QString(STR_REVISION).replace(',','.');
-    QMessageBox dlg(QMessageBox::NoIcon, tr("About ChessX"), tr("<h1>ChessX</h1>"
-                        "<p>Free chess database Version %1</p>"
+    QMessageBox dlg(QMessageBox::NoIcon, tr("About JKChessXTrainer"), tr("<h1>JKChessXTrainer</h1>"
+                        "<p> Version: %1</p>"
                         COPYRIGHT
                         "<p>License: GNU Public License 2 - GPLv2</p>"
-                        "<p>Current maintainer: <a href=\"mailto:jens-chessx@gmx.net\">Jens Nissen</a></p>"
+                        "<p>Based off of chessx, maintained by  <a href=\"mailto:jakinsman@gmail.com\">Jim A Kinsman</a></p>"
+                        "<p>Homepage: <a href=\"https://github.com/relipse/jkchessxtrainer\">https://github.com/relipse/jkchessxtrainer</a></p>"
+                        "<p>Thanks to ChessX crew below:</p>"
+                        "<p><a href=\"mailto:jens-chessx@gmx.net\">Jens Nissen</a></p>"
                         "<p>Testing, usability and website: Bruno Rizzuti</p>"
                         "<p>Further maintainers: Michal Rudolf, Ejner Borgbjerg</p>"
                         "<p>Additional coding: James Coons, Marius Roets, Sean Estabrooks, Rico Zenklusen, "
